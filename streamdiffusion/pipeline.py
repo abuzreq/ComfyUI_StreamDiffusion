@@ -240,7 +240,7 @@ class StreamDiffusion:
 
         self.init_noise = torch.randn(
             (self.batch_size, 4, self.latent_height, self.latent_width),
-            generator=generator,
+            generator=self.generator,
         ).to(device=self.device, dtype=self.dtype)
 
         self.stock_noise = torch.zeros_like(self.init_noise)
@@ -499,7 +499,7 @@ class StreamDiffusion:
             x_t_latent = self.encode_image(x)
         else:
             # TODO: check the dimension of x_t_latent
-            x_t_latent = torch.randn((1, 4, self.latent_height, self.latent_width)).to(
+            x_t_latent = torch.randn((1, 4, self.latent_height, self.latent_width), generator=self.generator).to(
                 device=self.device, dtype=self.dtype
             )
         x_0_pred_out = self.predict_x0_batch(x_t_latent)
@@ -534,7 +534,7 @@ class StreamDiffusion:
             # x_t_latent=x_t_latent.repeat((2, 1,1,1))
         else:
             # TODO: check the dimension of x_t_latent
-            x_t_latent = torch.randn((self.frame_bff_size, 4, self.latent_height, self.latent_width)).to(
+            x_t_latent = torch.randn((self.frame_bff_size, 4, self.latent_height, self.latent_width), generator=self.generator).to(
                 device=self.device, dtype=self.dtype
             )
         x_0_pred_out = self.predict_x0_batch(x_t_latent)
@@ -550,7 +550,7 @@ class StreamDiffusion:
     @torch.no_grad()
     def txt2img(self, batch_size: int = 1) -> torch.Tensor:
         x_0_pred_out = self.predict_x0_batch(
-            torch.randn((batch_size, 4, self.latent_height, self.latent_width)).to(
+            torch.randn((batch_size, 4, self.latent_height, self.latent_width), generator=self.generator).to(
                 device=self.device, dtype=self.dtype
             )
         )
@@ -560,6 +560,7 @@ class StreamDiffusion:
     def txt2img_sd_turbo(self, batch_size: int = 1) -> torch.Tensor:
         x_t_latent = torch.randn(
             (batch_size, 4, self.latent_height, self.latent_width),
+            generator=self.generator,
             device=self.device,
             dtype=self.dtype,
         )
